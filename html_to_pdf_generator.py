@@ -16,7 +16,7 @@ OUTPUT_FILE_NAME = '/tmp/output.html'
 PARAM_FILE_CONTENT_KEY = 'page_content'
 
 
-def generate_pdf_from_html(event):
+def generate_pdf_from_html():
     print("SIEMA :)))")
 
     # logger.info("Started lambda function")
