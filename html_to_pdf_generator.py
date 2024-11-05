@@ -11,8 +11,8 @@ logger = logging.getLogger()
 logger.setLevel("INFO")
 
 BUCKET_NAME = 'wkhtmltopdfhtmlcontent'
-INPUT_FILE_NAME = '/tmp/input.html'
-OUTPUT_FILE_NAME = '/tmp/output.html'
+# INPUT_FILE_NAME = '/tmp/input.html'
+# OUTPUT_FILE_NAME = '/tmp/output.html'
 PARAM_FILE_CONTENT_KEY = 'page_content'
 
 
@@ -31,8 +31,8 @@ def generate_pdf_from_html():
     # args = shlex.split(command)
     # subprocess.run(args)
 
-    s3 = boto3.resource("s3")
-    s3.Bucket(BUCKET_NAME).put_object(Key=INPUT_FILE_NAME, Body=result)
+    # s3 = boto3.resource("s3")
+    # s3.Bucket(BUCKET_NAME).put_object(Key=INPUT_FILE_NAME, Body=result)
 
     # return {
     #     "statusCode": 200,
@@ -56,8 +56,10 @@ def convert_html_to_pdf():
     }
     # converter.convert(source=source, target='sample_scale_2.pdf', print_options={"scale": 1})
     result = get_pdf_from_html(source=source, print_options=print_options)
-    # with open(target, "wb") as file:
-    #     file.write(result)
+    with open(target, "wb") as file:
+        file.write(result)
+        s3 = boto3.resource("s3")
+        s3.Bucket(BUCKET_NAME).put_object(Key=target, Body=file)
     return result
 
 def get_pdf_from_html(
