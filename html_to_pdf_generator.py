@@ -10,7 +10,7 @@ import boto3
 logger = logging.getLogger()
 logger.setLevel("INFO")
 
-BUCKET_NAME = ''
+BUCKET_NAME = 'wkhtmltopdfhtmlcontent'
 INPUT_FILE_NAME = '/tmp/input.html'
 OUTPUT_FILE_NAME = '/tmp/output.html'
 PARAM_FILE_CONTENT_KEY = 'page_content'
