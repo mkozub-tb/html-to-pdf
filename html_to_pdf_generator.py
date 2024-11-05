@@ -32,7 +32,7 @@ def generate_pdf_from_html():
     # subprocess.run(args)
 
     s3 = boto3.resource("s3")
-    s3.put_object(Bucket=BUCKET_NAME, Key=INPUT_FILE_NAME, Body=result)
+    s3.Bucket(BUCKET_NAME).put_object(Key=INPUT_FILE_NAME, Body=result)
 
     # return {
     #     "statusCode": 200,
