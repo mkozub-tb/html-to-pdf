@@ -58,8 +58,13 @@ def convert_html_to_pdf():
     result = get_pdf_from_html(source=source, print_options=print_options)
     with open(target, "wb") as file:
         file.write(result)
-        s3 = boto3.resource("s3")
-        s3.Bucket(BUCKET_NAME).put_object(Key=target, Body=file)
+
+    # s3 = boto3.resource("s3")
+    # s3.Bucket(BUCKET_NAME).put_object(Key=target, Body=file)
+    s3 = boto3.client("s3")
+    path_generated_file = os.path.abspath(target)
+    # source_generated_file = f'file:///{path_generated_file}'
+    s3.upload_file(Filename=path_generated_file, Bucket=BUCKET_NAME ,Key=target)
     return result
 
 def get_pdf_from_html(
