@@ -1,76 +1,60 @@
 import os
-import shlex
-import subprocess
-
-from pyhtml2pdf import converter
-import json
 import logging
 import boto3
+
+from datetime import datetime
+from pyhtml2pdf import converter
 
 logger = logging.getLogger()
 logger.setLevel("INFO")
 
 BUCKET_NAME = 'wkhtmltopdfhtmlcontent'
-# INPUT_FILE_NAME = '/tmp/input.html'
-# OUTPUT_FILE_NAME = '/tmp/output.html'
-PARAM_FILE_CONTENT_KEY = 'page_content'
+INPUT_FILE_NAME = 'sample_website.html'
+OUTPUT_FILE_NAME_PREFIX = '/tmp/output.html'
+OUTPUT_FILE_EXTENSION = 'pdf'
 
+def generate_pdf_from_html() -> None:
+    logger.info("Started generate_pdf_from_html function.")
 
-def generate_pdf_from_html():
-    print("SIEMA :)))")
+    result = get_pdf_from_html()
+    logger.info("Pdf has been generated.")
 
-    # logger.info("Started lambda function")
-    # message = 'HELLO FROM LAMBDA'
+    output_file_name = get_output_file_name()
 
-    # with open(INPUT_FILE_NAME, 'w') as input_file:
-    #     input_file.write(event[PARAM_FILE_CONTENT_KEY])
+    save_file_locally(output_file_name, result)
+    logger.info(f"File: {output_file_name} has been saved locally.")
 
-    result = convert_html_to_pdf()
+    save_file_to_s3(output_file_name)
+    logger.info(f"File: {output_file_name} has been saved in S3: {BUCKET_NAME}.")
 
-    # command = f'ls -l'
-    # args = shlex.split(command)
-    # subprocess.run(args)
+def get_pdf_from_html() -> bytes:
+    source: str = get_source_of_input_file()
+    timeout: int = 2
+    install_driver: bool = True
+    print_options: dict = get_print_options()
 
-    # s3 = boto3.resource("s3")
-    # s3.Bucket(BUCKET_NAME).put_object(Key=INPUT_FILE_NAME, Body=result)
+    return converter.__get_pdf_from_html(source, timeout, install_driver, print_options)
 
-    # return {
-    #     "statusCode": 200,
-    #     "headers": {
-    #         "Content-Type": "application/json"
-    #     },
-    #     "body": json.dumps({
-    #         "message ": message
-    #     })
-    # }
+def get_source_of_input_file() -> str:
+    path = os.path.abspath(INPUT_FILE_NAME)
+    return f'file:///{path}'
 
+def get_output_file_name() -> str:
+    curr_time = datetime.now()
+    formatted_time = curr_time.strftime("%Y%m%d%H%M%S%f")
+    random_prefix = f'{OUTPUT_FILE_NAME_PREFIX}_{formatted_time}'
+    return f'{random_prefix}.{OUTPUT_FILE_EXTENSION}'
 
-
-def convert_html_to_pdf():
-    # converter.convert('https://pypi.org', 'sample_scale_0_5.pdf', print_options={"scale": 0.5})
-    path = os.path.abspath('sample_website.html')
-    source = f'file:///{path}'
-    target = 'sample_scale_test_XXXX.pdf'
-    print_options = {
+def get_print_options() -> dict:
+    return {
         "scale" : 1
     }
-    # converter.convert(source=source, target='sample_scale_2.pdf', print_options={"scale": 1})
-    result = get_pdf_from_html(source=source, print_options=print_options)
-    with open(target, "wb") as file:
+
+def save_file_locally(output_file_name: str, result: bytes) -> None:
+    with open(output_file_name, "wb") as file:
         file.write(result)
 
-    # s3 = boto3.resource("s3")
-    # s3.Bucket(BUCKET_NAME).put_object(Key=target, Body=file)
+def save_file_to_s3(output_file_name: str) -> None:
     s3 = boto3.client("s3")
-    path_generated_file = os.path.abspath(target)
-    # source_generated_file = f'file:///{path_generated_file}'
-    s3.upload_file(Filename=path_generated_file, Bucket=BUCKET_NAME ,Key=target)
-    return result
-
-def get_pdf_from_html(
-        source: str,
-        timeout: int = 2,
-        install_driver: bool = True,
-        print_options: dict = {}
-):
-    return converter.__get_pdf_from_html(source, timeout, install_driver, print_options)
+    path_generated_file = os.path.abspath(output_file_name)
+    s3.upload_file(Filename=path_generated_file, Bucket=BUCKET_NAME, Key=output_file_name)
