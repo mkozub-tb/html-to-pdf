@@ -10,7 +10,7 @@ logger.setLevel("INFO")
 
 BUCKET_NAME = 'wkhtmltopdfhtmlcontent'
 INPUT_FILE_NAME = 'sample_website.html'
-OUTPUT_FILE_NAME_PREFIX = 'tmp/output.html'
+OUTPUT_FILE_NAME_PREFIX = '/tmp/output.html'
 OUTPUT_FILE_EXTENSION = 'pdf'
 
 def generate_pdf_from_html() -> None:
