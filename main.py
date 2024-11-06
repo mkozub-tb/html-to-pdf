@@ -1,9 +1,4 @@
-import html_to_pdf_generator
+import html_to_pdf_api
 
 if __name__ == '__main__':
-    # TODO listen to HTTP Requests
-    # TODO prepare data from request
-
-    html_to_pdf_generator.generate_pdf_from_html()
-
-    # TODO send HTTP response
+    html_to_pdf_api.run_flask_app()
