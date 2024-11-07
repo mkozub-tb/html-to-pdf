@@ -28,7 +28,7 @@ def handle_post_request():
 
 def run_flask_app():
     # app.run(host="localhost", port=8080)
-    app.run(host="0.0.0.0", port=80)
+    app.run(host="0.0.0.0", port=8000)
 
 # TODO to other file
 def save_as_html_file(data):
